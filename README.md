@@ -1,3 +1,12 @@
+Requirements
+
+Speechbrain
+
+Pytorch >= 1.5.0
+
+Python >=3.7.0
+
+
 1/ Automatic Speech Recognition
 
 python train_ASR.py wav2vec_ASR.yaml --data_parallel_backend
