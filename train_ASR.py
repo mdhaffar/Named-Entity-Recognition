@@ -14,38 +14,6 @@ from speechbrain.decoders.ctc import filter_ctc_output
 
 logger = logging.getLogger(__name__)
 
-def verfication_padding_gauche(position_actuelle,list_for_verif):
-    print(list_for_verif[position_actuelle])
-    if(list_for_verif[position_actuelle]=='===='):
-        return True
-    else:
-        print('len')
-        print(list_for_verif[position_actuelle+1:])
-        list_for_verif_actual = list_for_verif[position_actuelle+1:][0:list_for_verif[position_actuelle+1:].index('====')]
-        print('Gauche')
-        print(list_for_verif_actual)
-        if(all(element=='0' for element in list_for_verif_actual)):
-            return False
-        else:
-            return True
-
-
-def verfication_padding_droite(position_actuelle,list_for_verif):
-    if(list_for_verif[position_actuelle]=='===='):
-        return True
-    else:
-        if('====' in list_for_verif[0:position_actuelle][::-1]):
-            list_for_verif_actual = list_for_verif[len(list_for_verif[0:position_actuelle]) - list_for_verif[0:position_actuelle][::-1].index('====') - 1 + 1:position_actuelle]
-        else:
-            list_for_verif_actual = list_for_verif[0:position_actuelle]
-        print('Droite')
-        print(list_for_verif_actual)
-        if(all(element=='0' for element in list_for_verif_actual)):
-            return False
-        else:
-            return True
-
-
 # Define training procedure
 class ASR(sb.core.Brain):
     def compute_forward(self, batch, stage):
@@ -59,28 +27,12 @@ class ASR(sb.core.Brain):
         #,self.hidden_layer1,self.hidden_layer2,self.hidden_layer3,self.hidden_layer4,self.hidden_layer5,self.hidden_layer6,self.hidden_layer7,self.hidden_layer8,self.hidden_layer9,self.hidden_layer10,self.hidden_layer11,self.hidden_layer12,self.hidden_layer13,self.hidden_layer14,self.hidden_layer15,self.hidden_layer16,self.hidden_layer17,self.hidden_layer18,self.hidden_layer19,self.hidden_layer20,self.hidden_layer21,self.hidden_layer22,self.hidden_layer23,self.hidden_layer24,self.hidden_layer25,self.out_CNN = self.modules.wav2vec2(wavs)
  #       self.modules.wav2vec2.requires_grad = True
  #       print("feats:", feats)
-        print("^^^^^")
-        #print(feats)
-        #print(len(feats))
-        print("^^^^^")
+
         self.y = self.modules.enc(self.feats)
         self.x = self.modules.enc1(self.y)
-        #print('len x')
-        #print(x.size())
-        '''file_enc = open('enc_out','a+')
-        for j in x.tolist()[0]:
-            print(j)
-            print(len(j))
-            file_enc.write(str(j).strip('[]'))
-            file_enc.write('\n')'''
         logits = self.modules.ctc_lin(self.x)
-        '''print(logits)
-        print('len logits')
-        print(logits.size())'''
         p_ctc = self.hparams.log_softmax(logits)
-        '''print(p_ctc)
-        print('p_ctc')
-        print(p_ctc.size())'''
+       
         return p_ctc, wav_lens
 
 
@@ -96,62 +48,7 @@ class ASR(sb.core.Brain):
         #self.ctc_metrics.append(batch.id, p_ctc, chars, wav_lens, char_lens)
 #        print ("p_ctc: ", p_ctc)
 #        print ("wav_lens: ", wav_lens)
-        sequence,list_with_rep,list_without_rep = sb.decoders.ctc_greedy_decode(p_ctc, wav_lens, self.hparams.blank_index)
-        #========================================Add by Salima===============================================
-         
-        list_embbedings = self.feats.tolist()[0] #+ self.feats.tolist()[1] + self.feats.tolist()[2] + self.feats.tolist()[3]
-        list_x = self.x.tolist()[0] #+ self.x.tolist()[1] + self.x.tolist()[2] + self.x.tolist()[3]
-        list_y = self.y.tolist()[0] #+ self.y.tolist()[1] + self.y.tolist()[2] + self.y.tolist()[3]
-        print('list_with_rep')
-        print(list_with_rep)
-        file_csv = open('IDS_extraction.txt','a+')
-        for xy in ids:
-            file_csv.write(xy+'\n')
-        #list_embbedings_feat = self.feats.tolist()[0]
-        #list_embbedings_hidden_layer1 = self.hidden_layer1.tolist()[0]
-        ind_paste = 0
-        list_word = []
-        list_word_x = []
-        list_word_y = []
-        word = []
-        Wrd = ''
-        ID_file = 0
-        file_csv = open('features_to_Jarod_sentence_ASR_data_W2V_for_TTS_batch_size1.csv','a+')
-        file_csv_x = open('features_to_Jarod_sentence_ASR_data_Layer_DNN_1024_for_TTS_batch_size1.csv','a+')
-        file_csv_y = open('features_to_Jarod_sentence_ASR_data_Layer_DNN_80_for_TTS_batch_size1.csv','a+')
-        for ind,i in enumerate(list_with_rep):
-            if('==' in i):
-                print('###########################')
-                if(len(word)>0):
-                    #Open csv file
-                    file_feat_out = open('/data/coros3/smdhaffar/NER/features_to_Jarod_sentence_ASR_data_W2V_for_TTS_batch_size1/'+str(ID_file)+'_'+str(self.step)+'.npy','wb')
-                    file_feat_out_x = open('/data/coros3/smdhaffar/NER/features_to_Jarod_sentence_ASR_data_Layer_DNN_1024_for_TTS_batch_size1/'+str(ID_file)+'_'+str(self.step)+'.npy','wb')
-                    file_feat_out_y = open('/data/coros3/smdhaffar/NER/features_to_Jarod_sentence_ASR_data_Layer_DNN_80_for_TTS_batch_size1/'+str(ID_file)+'_'+str(self.step)+'.npy','wb')
-                    list_out_wrd = filter_ctc_output(word,blank_id = 0)
-                    To_write = ''.join(list_out_wrd)
-                    To_write = To_write.replace('_',' ')
-                    file_csv.write('/data/coros3/smdhaffar/NER/features_to_Jarod_sentence_ASR_data_W2V_for_TTS_batch_size1/'+str(ID_file)+'_'+str(self.step)+'.npy'+','+To_write.replace('0','')+'\n')
-                    file_csv_x.write('/data/coros3/smdhaffar/NER/features_to_Jarod_sentence_ASR_data_Layer_DNN_1024_for_TTS_batch_size1/'+str(ID_file)+'_'+str(self.step)+'.npy'+','+To_write.replace('0','')+'\n')
-                    file_csv_y.write('/data/coros3/smdhaffar/NER/features_to_Jarod_sentence_ASR_data_Layer_DNN_80_for_TTS_batch_size1/'+str(ID_file)+'_'+str(self.step)+'.npy'+','+To_write.replace('0','')+'\n')
-                    np.save(file_feat_out, np.array(list_word))
-                    np.save(file_feat_out_x, np.array(list_word_x))
-                    np.save(file_feat_out_y, np.array(list_word_y))
-                    list_word = []
-                    word = []
-                    Wrd = ''
-                    ID_file = ID_file + 1
-            else:
-                word.append(i.strip())
-                list_word.append(list_embbedings[ind_paste])
-                list_word_x.append(list_x[ind_paste]) 
-                list_word_y.append(list_y[ind_paste])
-                ind_paste = ind_paste + 1
-            
-            
-        #=========================================================================================================
-        '''for j in x.tolist()[0]:
-            file_enc.write(str(j).strip('[]'))
-            file_enc.write('\n')'''
+        sequence = sb.decoders.ctc_greedy_decode(p_ctc, wav_lens, self.hparams.blank_index)
 #        print ("sequence: ", sequence)
 #        print ("chars: ", chars)
 
