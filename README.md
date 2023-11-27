@@ -8,17 +8,17 @@ Requirements :
 
 How to run :
 
-1/ Automatic Speech Recognition
+1/ Train an Automatic Speech Recognition (ASR) system
 
 python train_ASR.py wav2vec_ASR.yaml --data_parallel_backend
 
-2/ Text to Embeddings
+2/ Train a Text-to-ASR-Embeddings model
 
-2.1/ Extract embeddings for the last layer of the ASR
+2.1/ Extract embeddings from the last layer of the ASR
 
-2.2/ Train Text-to-ASR-Embeddings model (text/extracted embeedings)
+2.2/ Train a Text-to-ASR-Embeddings model (text/extracted embeedings)
 
-Use the SpeechBrain script: (https://github.com/speechbrain/speechbrain/tree/develop/recipes/LJSpeech/TTS/tacotron2)
+Use the following SpeechBrain script: (https://github.com/speechbrain/speechbrain/tree/develop/recipes/LJSpeech/TTS/tacotron2)
 
 3/ Train a Named entity (NLU) system
 
