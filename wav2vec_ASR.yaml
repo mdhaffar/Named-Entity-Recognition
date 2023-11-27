@@ -20,18 +20,13 @@ train_log: !ref <output_folder>/train_log.txt
 wav2vec2_hub: LeBenchmark/wav2vec2-FR-7K-large
 
 
-data_folder: /data/coros1/acaubriere/data/data_quaero/  # e.g, /localscratch/cv-corpus-5.1-2020-06-22/fr
-#/local_disk/beroe/smdhaffar/workspace/speechbrain/recipes/FR_IT_Mix/SLU_data
+data_folder: #link for the data folder
 accented_letters: True
 language: fr # use 'it' for Italian, 'rw' for Kinyarwanda, 'en' for english
-train_csv: !ref /local_disk/beroe/smdhaffar/workspace2/speechbrain/recipes/QUAERO/data_augm.csv 
-valid_csv: !ref /data/coros1/acaubriere/data/data_etape/csv_ner-flat_16khz/dev_etape_ner-flat.csv 
-test_csv: /local_disk/beroe/smdhaffar/workspace2/speechbrain/recipes/QUAERO/data_augm.csv
-#/data/coros1/acaubriere/data/data_etape/csv_ner-flat_16khz/test_etape_ner-flat.csv
-#/data/coros1/acaubriere/data/data_etape/csv_ner-flat_16khz/test_etape_ner-flat.csv
-#/local_disk/beroe/smdhaffar/workspace2/speechbrain/recipes/QUAERO/data_augm.csv
-#/data/coros1/acaubriere/data/data_quaero/csv_ner-flat_16khz/test_quaero_ner-flat.csv 
-#/data/coros1/acaubriere/data/data_quaero/csv_ner-flat_16khz/train_quaero_ner-flat.csv
+train_csv: #link for the train data
+valid_csv: #link for the validation data
+test_csv: #link for the test data
+
 # longer sentences certainly correspond to "open microphones".
 avoid_if_longer_than: 80.0
 avoid_if_smaller_than: 0.5 
